@@ -1,52 +1,38 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-// 🔁 Utility to get data from IndexedDB
-const openDb = () => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("imageDatabase", 1);
+// Cloudinary Config
+const CLOUD_NAME = "drpyepp9t";
+const UPLOAD_PRESET = "unsigned_preset"; // Your preset name
 
-    request.onerror = (event) => {
-      reject("Error opening IndexedDB");
-    };
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", UPLOAD_PRESET);
 
-    request.onsuccess = (event) => {
-      resolve(event.target.result);
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains("images")) {
-        db.createObjectStore("images", { keyPath: "id" });
-      }
-    };
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+    method: "POST",
+    body: formData,
   });
+
+  const data = await response.json();
+  return data.secure_url;
 };
 
-// Save image to IndexedDB
-const saveImageToIndexedDB = async (id, base64Image) => {
-  const db = await openDb();
-  const transaction = db.transaction("images", "readwrite");
-  const store = transaction.objectStore("images");
-
-  store.put({ id, image: base64Image });
-  await transaction.complete;
+const getSavedContainers = () => {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = localStorage.getItem("imageContainers");
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    return [];
+  }
 };
 
-// Retrieve image from IndexedDB
-const getImageFromIndexedDB = async (id) => {
-  const db = await openDb();
-  const transaction = db.transaction("images", "readonly");
-  const store = transaction.objectStore("images");
-
-  return new Promise((resolve, reject) => {
-    const request = store.get(id);
-    request.onsuccess = () => resolve(request.result ? request.result.image : null);
-    request.onerror = () => reject("Error retrieving image from IndexedDB");
-  });
+const saveToLocalStorage = (data) => {
+  localStorage.setItem("imageContainers", JSON.stringify(data));
 };
 
-// 🔁 Child: Single Image Slider
 const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -54,19 +40,11 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      const updated = [...images, base64Image];
+    const uploadedUrl = await uploadToCloudinary(file);
 
-      // Save image to IndexedDB
-      await saveImageToIndexedDB(id, base64Image);
-
-      updateImages(id, updated);
-      setCurrentIndex(updated.length - 1); // Jump to new image
-    };
-
-    reader.readAsDataURL(file);
+    const updated = [...images, uploadedUrl];
+    updateImages(id, updated);
+    setCurrentIndex(updated.length - 1); // Jump to new image
   };
 
   const handleDelete = () => {
@@ -87,7 +65,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   };
 
   return (
-    <div className="relative w-full h-full rounded shadow-md">
+    <div className="relative w-full h-full rounded shadow-md my-4">
       <button
         onClick={() => deleteContainer(id)}
         className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
@@ -108,7 +86,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
             <img
               src={images[currentIndex]}
               alt="preview"
-              className="w-full h-full"
+              className="w-full h-auto max-h-[300px] object-contain"
             />
           ) : (
             <span className="text-gray-400">No Image</span>
@@ -145,37 +123,16 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   );
 };
 
-// 🔁 Main App
 export default function App() {
   const [containers, setContainers] = useState([]);
 
-  // 🔃 Load from IndexedDB on first load
   useEffect(() => {
-    const loadImagesFromDb = async () => {
-      const savedImages = [];
-      for (let i = 0; i < containers.length; i++) {
-        const container = containers[i];
-        const imagePromises = container.images.map((imageId) => getImageFromIndexedDB(imageId));
-        const imagesData = await Promise.all(imagePromises);
-        savedImages.push({ ...container, images: imagesData });
-      }
-      setContainers(savedImages);
-    };
-
-    loadImagesFromDb();
+    const saved = getSavedContainers();
+    setContainers(saved);
   }, []);
 
-  // 🔄 Save to IndexedDB on containers change
   useEffect(() => {
-    const saveAllImages = async () => {
-      for (const container of containers) {
-        for (const image of container.images) {
-          await saveImageToIndexedDB(container.id, image);
-        }
-      }
-    };
-
-    saveAllImages();
+    saveToLocalStorage(containers);
   }, [containers]);
 
   const addNewContainer = () => {
@@ -190,14 +147,16 @@ export default function App() {
   const updateImages = (id, updatedImages) => {
     setContainers((prev) =>
       prev.map((container) =>
-        container.id === id ? { ...container, images: updatedImages } : container
+        container.id === id
+          ? { ...container, images: updatedImages }
+          : container
       )
     );
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center">
-      <h1 className="text-2xl font-bold">Persistent Image Sliders</h1>
+    <div className="min-h-screen p-4 flex flex-col items-center">
+      <h1 className="text-2xl font-bold mb-4">Cloud-Persistent Image Sliders</h1>
 
       {containers.map((container) => (
         <ImageSlider
@@ -211,7 +170,7 @@ export default function App() {
 
       <button
         onClick={addNewContainer}
-        className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 transition"
+        className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 transition mt-4"
       >
         ➕ Add New Container
       </button>
