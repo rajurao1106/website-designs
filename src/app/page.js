@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 // Cloudinary Config
 const CLOUD_NAME = "drpyepp9t";
-const UPLOAD_PRESET = "unsigned_preset"; // Your preset name
+const UPLOAD_PRESET = "rajurao"; // Your unsigned preset name
 
 const uploadToCloudinary = async (file) => {
   const formData = new FormData();
@@ -16,6 +16,12 @@ const uploadToCloudinary = async (file) => {
   });
 
   const data = await response.json();
+
+  if (!response.ok) {
+    console.error("Upload failed:", data);
+    throw new Error(data?.error?.message || "Upload failed");
+  }
+
   return data.secure_url;
 };
 
@@ -25,12 +31,17 @@ const getSavedContainers = () => {
     const data = localStorage.getItem("imageContainers");
     return data ? JSON.parse(data) : [];
   } catch (e) {
+    console.error("Failed to load containers:", e);
     return [];
   }
 };
 
 const saveToLocalStorage = (data) => {
-  localStorage.setItem("imageContainers", JSON.stringify(data));
+  try {
+    localStorage.setItem("imageContainers", JSON.stringify(data));
+  } catch (e) {
+    console.error("Failed to save to localStorage:", e);
+  }
 };
 
 const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
@@ -40,11 +51,14 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const uploadedUrl = await uploadToCloudinary(file);
-
-    const updated = [...images, uploadedUrl];
-    updateImages(id, updated);
-    setCurrentIndex(updated.length - 1); // Jump to new image
+    try {
+      const uploadedUrl = await uploadToCloudinary(file);
+      const updated = [...images, uploadedUrl];
+      updateImages(id, updated);
+      setCurrentIndex(updated.length - 1); // Jump to new image
+    } catch (err) {
+      alert("Image upload failed. Please try again.");
+    }
   };
 
   const handleDelete = () => {
@@ -73,17 +87,18 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
         Delete Container
       </button>
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         <button
           onClick={showPrev}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
-          Left
+          ⬅️
         </button>
 
         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
           {images.length > 0 ? (
             <img
+              key={images[currentIndex]} // 🔥 Ensures proper image re-render
               src={images[currentIndex]}
               alt="preview"
               className="w-full h-auto max-h-[300px] object-contain"
@@ -105,7 +120,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
             onClick={showNext}
             className="bg-blue-500 text-white px-4 py-2 rounded"
           >
-            Right
+            ➡️
           </button>
 
           <label className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer text-center">
@@ -131,27 +146,29 @@ export default function App() {
     setContainers(saved);
   }, []);
 
-  useEffect(() => {
-    saveToLocalStorage(containers);
-  }, [containers]);
+  const saveAndSetContainers = (updated) => {
+    setContainers(updated);
+    saveToLocalStorage(updated);
+  };
 
   const addNewContainer = () => {
     const newContainer = { id: Date.now(), images: [] };
-    setContainers((prev) => [...prev, newContainer]);
+    const updated = [...containers, newContainer];
+    saveAndSetContainers(updated);
   };
 
   const deleteContainer = (idToRemove) => {
-    setContainers((prev) => prev.filter((c) => c.id !== idToRemove));
+    const updated = containers.filter((c) => c.id !== idToRemove);
+    saveAndSetContainers(updated);
   };
 
   const updateImages = (id, updatedImages) => {
-    setContainers((prev) =>
-      prev.map((container) =>
-        container.id === id
-          ? { ...container, images: updatedImages }
-          : container
-      )
+    const updated = containers.map((container) =>
+      container.id === id
+        ? { ...container, images: updatedImages }
+        : container
     );
+    saveAndSetContainers(updated);
   };
 
   return (
