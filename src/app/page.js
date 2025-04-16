@@ -1,35 +1,71 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-// 🔁 Utility to get data from localStorage
-const getSavedContainers = () => {
-  if (typeof window === "undefined") return [];
-  try {
-    const data = localStorage.getItem("imageContainers");
-    return data ? JSON.parse(data) : [];
-  } catch (e) {
-    return [];
-  }
+// 🔁 Utility to get data from IndexedDB
+const openDb = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("imageDatabase", 1);
+
+    request.onerror = (event) => {
+      reject("Error opening IndexedDB");
+    };
+
+    request.onsuccess = (event) => {
+      resolve(event.target.result);
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains("images")) {
+        db.createObjectStore("images", { keyPath: "id" });
+      }
+    };
+  });
 };
 
-const saveToLocalStorage = (data) => {
-  localStorage.setItem("imageContainers", JSON.stringify(data));
+// Save image to IndexedDB
+const saveImageToIndexedDB = async (id, base64Image) => {
+  const db = await openDb();
+  const transaction = db.transaction("images", "readwrite");
+  const store = transaction.objectStore("images");
+
+  store.put({ id, image: base64Image });
+  await transaction.complete;
+};
+
+// Retrieve image from IndexedDB
+const getImageFromIndexedDB = async (id) => {
+  const db = await openDb();
+  const transaction = db.transaction("images", "readonly");
+  const store = transaction.objectStore("images");
+
+  return new Promise((resolve, reject) => {
+    const request = store.get(id);
+    request.onsuccess = () => resolve(request.result ? request.result.image : null);
+    request.onerror = () => reject("Error retrieving image from IndexedDB");
+  });
 };
 
 // 🔁 Child: Single Image Slider
 const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const handleAddImage = (e) => {
+  const handleAddImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = () => {
-      const updated = [...images, reader.result];
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      const updated = [...images, base64Image];
+
+      // Save image to IndexedDB
+      await saveImageToIndexedDB(id, base64Image);
+
       updateImages(id, updated);
-      setCurrentIndex(updated.length - 1); // jump to new image
+      setCurrentIndex(updated.length - 1); // Jump to new image
     };
+
     reader.readAsDataURL(file);
   };
 
@@ -51,7 +87,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   };
 
   return (
-    <div className="relative w-full h-full  rounded shadow-md">
+    <div className="relative w-full h-full rounded shadow-md">
       <button
         onClick={() => deleteContainer(id)}
         className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
@@ -67,7 +103,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
           Left
         </button>
 
-        <div className="w-full h-full bg-gray-100  flex items-center justify-center">
+        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
           {images.length > 0 ? (
             <img
               src={images[currentIndex]}
@@ -113,15 +149,33 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
 export default function App() {
   const [containers, setContainers] = useState([]);
 
-  // 🔃 Load from localStorage on first load
+  // 🔃 Load from IndexedDB on first load
   useEffect(() => {
-    const saved = getSavedContainers();
-    setContainers(saved);
+    const loadImagesFromDb = async () => {
+      const savedImages = [];
+      for (let i = 0; i < containers.length; i++) {
+        const container = containers[i];
+        const imagePromises = container.images.map((imageId) => getImageFromIndexedDB(imageId));
+        const imagesData = await Promise.all(imagePromises);
+        savedImages.push({ ...container, images: imagesData });
+      }
+      setContainers(savedImages);
+    };
+
+    loadImagesFromDb();
   }, []);
 
-  // 🔄 Save to localStorage on containers change
+  // 🔄 Save to IndexedDB on containers change
   useEffect(() => {
-    saveToLocalStorage(containers);
+    const saveAllImages = async () => {
+      for (const container of containers) {
+        for (const image of container.images) {
+          await saveImageToIndexedDB(container.id, image);
+        }
+      }
+    };
+
+    saveAllImages();
   }, [containers]);
 
   const addNewContainer = () => {
