@@ -1,7 +1,14 @@
-"use client"
-import React, { useEffect, useState } from 'react';
+"use client";
+import React, { useEffect, useState } from "react";
 
-// Child: Single Image Slider
+// Loader Spinner
+const Loader = () => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+  </div>
+);
+
+// Image Slider Component
 const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -13,12 +20,12 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
     reader.onload = () => {
       const updated = [...images, reader.result];
       updateImages(id, updated);
-      setCurrentIndex(updated.length - 1); // jump to new image
+      setCurrentIndex(updated.length - 1);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleDelete = () => {
+  const handleDeleteImage = () => {
     if (images.length === 0) return;
     const updated = images.filter((_, idx) => idx !== currentIndex);
     updateImages(id, updated);
@@ -26,70 +33,77 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   };
 
   const showPrev = () => {
-    if (images.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   const showNext = () => {
-    if (images.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
   return (
-    <div className="relative w-full h-full bg-black rounded shadow-md">
-      <button
-        onClick={() => deleteContainer(id)}
-        className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
-      >
-        Delete Container
-      </button>
+    <div className="relative w-full  bg-gray-800 overflow-hidden shadow-lg ">
+      {/* Image Display */}
+      <div className="w-full h-full flex items-center justify-center bg-black">
+        {images.length > 0 ? (
+          <img
+            src={images[currentIndex]}
+            alt="Slide"
+            className="w-full h-full  transition-all duration-700"
+          />
+        ) : (
+          <span className="text-white text-xl">No Image</span>
+        )}
+      </div>
 
-      <div className="flex items-center">
-        <button
-          onClick={showPrev}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Left
-        </button>
-
-        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-          {images.length > 0 ? (
-            <img
-              src={images[currentIndex]}
-              alt="preview"
-              className="w-full h-full"
-            />
-          ) : (
-            <span className="text-gray-400">No Image</span>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
+      {/* Navigation Arrows */}
+      {images.length > 0 && (
+        <>
           <button
-            onClick={handleDelete}
-            className="bg-red-500 text-white px-4 py-1 rounded"
+            onClick={showPrev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-3 transition"
           >
-            Delete
+            ⬅
           </button>
-
           <button
             onClick={showNext}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-3 transition"
           >
-            Right
+            ➡
           </button>
+        </>
+      )}
 
-          <label className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer text-center">
-            Add Image
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleAddImage}
-              className="hidden"
-            />
-          </label>
-        </div>
+      {/* Top-Right Action Buttons */}
+      <div className="absolute bottom-4 right-4 flex gap-3">
+        <button
+          onClick={() => deleteContainer(id)}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm shadow"
+        >
+          Delete Container
+        </button>
+
+        <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer text-sm shadow">
+          Add Image
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleAddImage}
+            className="hidden"
+          />
+        </label>
       </div>
+
+      {/* Bottom Center Delete Image Button */}
+      {images.length > 0 && (
+        <div className="absolute bottom-4 left-28 -translate-x-1/2">
+          <button
+            onClick={handleDeleteImage}
+            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full text-sm shadow"
+          >
+            Delete Current Image
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -97,35 +111,38 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
 // Main App
 export default function App() {
   const [containers, setContainers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load containers from MongoDB
   useEffect(() => {
     const loadContainers = async () => {
-      const res = await fetch('/api/containers');
-      const data = await res.json();
-      setContainers(data);
+      try {
+        const res = await fetch("/api/containers");
+        const data = await res.json();
+        setContainers(data);
+      } catch (error) {
+        console.error("Failed to fetch containers", error);
+      } finally {
+        setLoading(false);
+      }
     };
     loadContainers();
   }, []);
 
-  // Add new container
   const addNewContainer = async () => {
-    const res = await fetch('/api/containers', { method: 'POST' });
+    const res = await fetch("/api/containers", { method: "POST" });
     const newContainer = await res.json();
     setContainers((prev) => [...prev, newContainer]);
   };
 
-  // Delete container
   const deleteContainer = async (id) => {
-    await fetch(`/api/containers/${id}`, { method: 'DELETE' });
+    await fetch(`/api/containers/${id}`, { method: "DELETE" });
     setContainers((prev) => prev.filter((c) => c._id !== id));
   };
 
-  // Update container images
   const updateImages = async (id, updatedImages) => {
     await fetch(`/api/containers/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ images: updatedImages }),
     });
     setContainers((prev) =>
@@ -133,9 +150,11 @@ export default function App() {
     );
   };
 
+  if (loading) return <Loader />;
+
   return (
-    <div className="min-h-screen flex flex-col items-center">
-      {/* <h1 className="text-2xl font-bold">Persistent Image Sliders</h1> */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center">
+      {/* <h1 className="text-4xl font-bold mb-10 text-center">Hero Image Slider</h1> */}
 
       {containers.map((container) => (
         <ImageSlider
@@ -149,9 +168,9 @@ export default function App() {
 
       <button
         onClick={addNewContainer}
-        className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 transition"
+        className="mt-8 bg-purple-700 hover:bg-purple-800 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-md transition"
       >
-        ➕ Add New Container
+        ➕ Add New Slider
       </button>
     </div>
   );
