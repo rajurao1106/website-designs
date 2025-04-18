@@ -169,10 +169,11 @@ export default function App() {
 
       <button
         onClick={addNewContainer}
-        className="mt-8 bg-purple-700 hover:bg-purple-800 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-md transition"
+        className="my-4 bg-purple-700 hover:bg-purple-800 text-white px-8 py-3 rounded-2xl font-semibold text-lg shadow-md transition"
       >
         ➕ Add New Slider
       </button>
+      
     </div>
   );
 }
