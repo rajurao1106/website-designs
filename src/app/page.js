@@ -75,14 +75,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
 
       {/* Top-Right Action Buttons */}
       <div className="absolute bottom-4 right-4 flex gap-3">
-        <button
-          onClick={() => deleteContainer(id)}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm shadow"
-        >
-          Delete Container
-        </button>
-
-        <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer text-sm shadow">
+      <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer text-sm shadow">
           Add Image
           <input
             type="file"
@@ -91,16 +84,24 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
             className="hidden"
           />
         </label>
+        <button
+          onClick={handleDeleteImage}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm shadow"
+        >
+          Delete Image
+        </button>
+
+        
       </div>
 
       {/* Bottom Center Delete Image Button */}
       {images.length > 0 && (
         <div className="absolute bottom-4 left-28 -translate-x-1/2">
           <button
-            onClick={handleDeleteImage}
+            onClick={() => deleteContainer(id)}
             className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full text-sm shadow"
           >
-            Delete Current Image
+            Delete Container
           </button>
         </div>
       )}
