@@ -1,64 +1,21 @@
-"use client";
-import React, { useEffect, useState } from "react";
+"use client"
+import React, { useEffect, useState } from 'react';
 
-// Cloudinary Config
-const CLOUD_NAME = "drpyepp9t";
-const UPLOAD_PRESET = "rajurao"; // Your unsigned preset name
-
-const uploadToCloudinary = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", UPLOAD_PRESET);
-
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-    method: "POST",
-    body: formData,
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error("Upload failed:", data);
-    throw new Error(data?.error?.message || "Upload failed");
-  }
-
-  return data.secure_url;
-};
-
-const getSavedContainers = () => {
-  if (typeof window === "undefined") return [];
-  try {
-    const data = localStorage.getItem("imageContainers");
-    return data ? JSON.parse(data) : [];
-  } catch (e) {
-    console.error("Failed to load containers:", e);
-    return [];
-  }
-};
-
-const saveToLocalStorage = (data) => {
-  try {
-    localStorage.setItem("imageContainers", JSON.stringify(data));
-  } catch (e) {
-    console.error("Failed to save to localStorage:", e);
-  }
-};
-
+// Child: Single Image Slider
 const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const handleAddImage = async (e) => {
+  const handleAddImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    try {
-      const uploadedUrl = await uploadToCloudinary(file);
-      const updated = [...images, uploadedUrl];
+    const reader = new FileReader();
+    reader.onload = () => {
+      const updated = [...images, reader.result];
       updateImages(id, updated);
-      setCurrentIndex(updated.length - 1); // Jump to new image
-    } catch (err) {
-      alert("Image upload failed. Please try again.");
-    }
+      setCurrentIndex(updated.length - 1); // jump to new image
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDelete = () => {
@@ -79,7 +36,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   };
 
   return (
-    <div className="relative w-full h-full rounded shadow-md my-4">
+    <div className="relative w-full h-full bg-black rounded shadow-md">
       <button
         onClick={() => deleteContainer(id)}
         className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
@@ -87,21 +44,20 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
         Delete Container
       </button>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center">
         <button
           onClick={showPrev}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
-          ⬅️
+          Left
         </button>
 
         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
           {images.length > 0 ? (
             <img
-              key={images[currentIndex]} // 🔥 Ensures proper image re-render
               src={images[currentIndex]}
               alt="preview"
-              className="w-full h-auto max-h-[300px] object-contain"
+              className="w-full h-full"
             />
           ) : (
             <span className="text-gray-400">No Image</span>
@@ -120,7 +76,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
             onClick={showNext}
             className="bg-blue-500 text-white px-4 py-2 rounded"
           >
-            ➡️
+            Right
           </button>
 
           <label className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer text-center">
@@ -138,47 +94,53 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   );
 };
 
+// Main App
 export default function App() {
   const [containers, setContainers] = useState([]);
 
+  // Load containers from MongoDB
   useEffect(() => {
-    const saved = getSavedContainers();
-    setContainers(saved);
+    const loadContainers = async () => {
+      const res = await fetch('/api/containers');
+      const data = await res.json();
+      setContainers(data);
+    };
+    loadContainers();
   }, []);
 
-  const saveAndSetContainers = (updated) => {
-    setContainers(updated);
-    saveToLocalStorage(updated);
+  // Add new container
+  const addNewContainer = async () => {
+    const res = await fetch('/api/containers', { method: 'POST' });
+    const newContainer = await res.json();
+    setContainers((prev) => [...prev, newContainer]);
   };
 
-  const addNewContainer = () => {
-    const newContainer = { id: Date.now(), images: [] };
-    const updated = [...containers, newContainer];
-    saveAndSetContainers(updated);
+  // Delete container
+  const deleteContainer = async (id) => {
+    await fetch(`/api/containers/${id}`, { method: 'DELETE' });
+    setContainers((prev) => prev.filter((c) => c._id !== id));
   };
 
-  const deleteContainer = (idToRemove) => {
-    const updated = containers.filter((c) => c.id !== idToRemove);
-    saveAndSetContainers(updated);
-  };
-
-  const updateImages = (id, updatedImages) => {
-    const updated = containers.map((container) =>
-      container.id === id
-        ? { ...container, images: updatedImages }
-        : container
+  // Update container images
+  const updateImages = async (id, updatedImages) => {
+    await fetch(`/api/containers/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ images: updatedImages }),
+    });
+    setContainers((prev) =>
+      prev.map((c) => (c._id === id ? { ...c, images: updatedImages } : c))
     );
-    saveAndSetContainers(updated);
   };
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">Cloud-Persistent Image Sliders</h1>
+    <div className="min-h-screen flex flex-col items-center">
+      <h1 className="text-2xl font-bold">Persistent Image Sliders</h1>
 
       {containers.map((container) => (
         <ImageSlider
-          key={container.id}
-          id={container.id}
+          key={container._id}
+          id={container._id}
           images={container.images}
           updateImages={updateImages}
           deleteContainer={deleteContainer}
@@ -187,7 +149,7 @@ export default function App() {
 
       <button
         onClick={addNewContainer}
-        className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 transition mt-4"
+        className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 transition"
       >
         ➕ Add New Container
       </button>
