@@ -135,7 +135,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center">
-      <h1 className="text-2xl font-bold">Persistent Image Sliders</h1>
+      {/* <h1 className="text-2xl font-bold">Persistent Image Sliders</h1> */}
 
       {containers.map((container) => (
         <ImageSlider
