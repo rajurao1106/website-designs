@@ -4,6 +4,8 @@ import { ImSpinner10 } from "react-icons/im";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import { TbContainerOff } from "react-icons/tb";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
 
 
 
@@ -68,22 +70,22 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
     <>
       <button
         onClick={showPrev}
-        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-black rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-[#c9c9c975] bg-opacity-30 hover:bg-opacity-50 text-black rounded-full transition text-lg max-lg:text-sm p-2 max-lg:p-1"
       >
-        ⬅
+        <IoIosArrowBack/>
       </button>
       <button
         onClick={showNext}
-        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-black rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-[#c9c9c975] bg-opacity-30 hover:bg-opacity-50 text-black rounded-full transition text-lg max-lg:text-sm p-2 max-lg:p-1"
       >
-        ➡
+        <IoIosArrowForward/>
       </button>
     </>
   )}
 
   {/* Top-Right Action Buttons */}
-  <div className="absolute bottom-4 right-4 flex sm:flex-row gap-2 sm:gap-3">
-    <label className="bg-green-600 hover:bg-green-700 text-white px-1 sm:px-4 sm:py-2 rounded-md cursor-pointer text-lg shadow text-center">
+  <div className="absolute bottom-0 right-2 flex sm:flex-row gap-2 sm:gap-3">
+    <label className="bg-green-600 hover:bg-green-700 flex justify-center items-center text-white px-1 sm:px-4 sm:py-2 rounded-md cursor-pointer text-lg shadow text-center">
       <IoMdAdd/>
       <input
         type="file"
@@ -94,7 +96,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
     </label>
     <button
       onClick={handleDeleteImage}
-      className="bg-red-600 hover:bg-red-700 text-white px-1 sm:px-4 sm:py-2 rounded-md text-lg shadow"
+      className="bg-red-600 hover:bg-red-700 text-white px-1 py-1 sm:px-4 sm:py-2 rounded-md text-lg shadow"
     >
       <MdOutlineDeleteForever/>
     </button>
@@ -102,7 +104,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
 
   {/* Bottom Center Delete Image Button */}
   {images.length > 0 && (
-    <div className="absolute bottom-2 left-12 max-lg:left-6 transform -translate-x-1/2">
+    <div className="absolute bottom-0 left-10 max-lg:left-6 transform -translate-x-1/2">
       <button
         onClick={() => deleteContainer(id)}
         className="bg-red-500 hover:bg-red-600 text-white p-1 sm:px-6 sm:py-2 rounded-full text-lg shadow text-center"
