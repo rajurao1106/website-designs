@@ -1,10 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { ImSpinner10 } from "react-icons/im";
+
 
 // Loader Spinner
 const Loader = () => (
-  <div className="flex justify-center items-center h-screen">
-    <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+  <div className="flex flex-col justify-center items-center h-screen bg-black gap-2">
+    <div className="text-6xl text-blue-500 flex justify-center items-center animate-spin" ><ImSpinner10/></div>
+    <p className="text-white text-xl">Loading...</p>
   </div>
 );
 
