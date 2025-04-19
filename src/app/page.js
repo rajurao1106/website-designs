@@ -44,71 +44,70 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
   };
 
   return (
-    <div className="relative w-full  bg-gray-800 overflow-hidden shadow-lg ">
-      {/* Image Display */}
-      <div className="w-full h-full flex items-center justify-center bg-black">
-        {images.length > 0 ? (
-          <img
-            src={images[currentIndex]}
-            alt="Slide"
-            className="w-full h-full  transition-all duration-700"
-          />
-        ) : (
-          <span className="text-white text-xl">No Image</span>
-        )}
-      </div>
+   <div className="relative w-full bg-gray-800 overflow-hidden shadow-lg">
+  {/* Image Display */}
+  <div className="w-full h-full flex items-center justify-center bg-black">
+    {images.length > 0 ? (
+      <img
+        src={images[currentIndex]}
+        alt="Slide"
+        className="w-full h-full transition-all duration-700"
+      />
+    ) : (
+      <span className="text-white text-lg sm:text-xl">No Image</span>
+    )}
+  </div>
 
-      {/* Navigation Arrows */}
-      {images.length > 0 && (
-        <>
-          <button
-            onClick={showPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-3 transition"
-          >
-            ⬅
-          </button>
-          <button
-            onClick={showNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-3 transition"
-          >
-            ➡
-          </button>
-        </>
-      )}
+  {/* Navigation Arrows */}
+  {images.length > 0 && (
+    <>
+      <button
+        onClick={showPrev}
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
+      >
+        ⬅
+      </button>
+      <button
+        onClick={showNext}
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
+      >
+        ➡
+      </button>
+    </>
+  )}
 
-      {/* Top-Right Action Buttons */}
-      <div className="absolute bottom-4 right-4 flex gap-3">
-      <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md cursor-pointer text-sm shadow">
-          Add Image
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleAddImage}
-            className="hidden"
-          />
-        </label>
-        <button
-          onClick={handleDeleteImage}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm shadow"
-        >
-          Delete Image
-        </button>
+  {/* Top-Right Action Buttons */}
+  <div className="absolute bottom-4 right-4 flex sm:flex-row gap-2 sm:gap-3">
+    <label className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md cursor-pointer text-sm shadow text-center">
+      Add Image
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleAddImage}
+        className="hidden"
+      />
+    </label>
+    <button
+      onClick={handleDeleteImage}
+      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-sm shadow"
+    >
+      Delete Image
+    </button>
+  </div>
 
-        
-      </div>
-
-      {/* Bottom Center Delete Image Button */}
-      {images.length > 0 && (
-        <div className="absolute bottom-4 left-28 -translate-x-1/2">
-          <button
-            onClick={() => deleteContainer(id)}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full text-sm shadow"
-          >
-            Delete Container
-          </button>
-        </div>
-      )}
+  {/* Bottom Center Delete Image Button */}
+  {images.length > 0 && (
+    <div className="absolute bottom-4 left-22 transform -translate-x-1/2">
+      <button
+        onClick={() => deleteContainer(id)}
+        className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 sm:px-6 sm:py-2 rounded-full text-sm shadow text-center"
+      >
+        Delete Container
+      </button>
     </div>
+  )}
+</div>
+
   );
 };
 
@@ -172,7 +171,7 @@ export default function App() {
 
       <button
         onClick={addNewContainer}
-        className="my-4 bg-purple-700 hover:bg-purple-800 text-white px-8 py-3 rounded-2xl font-semibold text-lg shadow-md transition"
+        className="my-4 bg-purple-700 hover:bg-purple-800 text-white px-8 py-3 rounded-2xl font-semibold shadow-md transition"
       >
         ➕ Add New Slider
       </button>
