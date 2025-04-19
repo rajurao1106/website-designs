@@ -1,6 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { ImSpinner10 } from "react-icons/im";
+import { MdOutlineDeleteForever } from "react-icons/md";
+import { IoMdAdd } from "react-icons/io";
+import { TbContainerOff } from "react-icons/tb";
+
+
 
 
 // Loader Spinner
@@ -63,13 +68,13 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
     <>
       <button
         onClick={showPrev}
-        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-black rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
       >
         ⬅
       </button>
       <button
         onClick={showNext}
-        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-black rounded-full p-2 sm:p-3 transition text-sm sm:text-base"
       >
         ➡
       </button>
@@ -78,8 +83,8 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
 
   {/* Top-Right Action Buttons */}
   <div className="absolute bottom-4 right-4 flex sm:flex-row gap-2 sm:gap-3">
-    <label className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md cursor-pointer text-sm shadow text-center">
-      Add Image
+    <label className="bg-green-600 hover:bg-green-700 text-white px-1 sm:px-4 sm:py-2 rounded-md cursor-pointer text-lg shadow text-center">
+      <IoMdAdd/>
       <input
         type="file"
         accept="image/*"
@@ -89,20 +94,20 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
     </label>
     <button
       onClick={handleDeleteImage}
-      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-sm shadow"
+      className="bg-red-600 hover:bg-red-700 text-white px-1 sm:px-4 sm:py-2 rounded-md text-lg shadow"
     >
-      Delete Image
+      <MdOutlineDeleteForever/>
     </button>
   </div>
 
   {/* Bottom Center Delete Image Button */}
   {images.length > 0 && (
-    <div className="absolute bottom-4 left-22 transform -translate-x-1/2">
+    <div className="absolute bottom-2 left-6 transform -translate-x-1/2">
       <button
         onClick={() => deleteContainer(id)}
-        className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 sm:px-6 sm:py-2 rounded-full text-sm shadow text-center"
+        className="bg-red-500 hover:bg-red-600 text-white p-1 sm:px-6 sm:py-2 rounded-full text-lg shadow text-center"
       >
-        Delete Container
+      <TbContainerOff/>
       </button>
     </div>
   )}
