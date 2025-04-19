@@ -102,7 +102,7 @@ const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
 
   {/* Bottom Center Delete Image Button */}
   {images.length > 0 && (
-    <div className="absolute bottom-2 left-6 transform -translate-x-1/2">
+    <div className="absolute bottom-2 left-12 max-lg:left-6 transform -translate-x-1/2">
       <button
         onClick={() => deleteContainer(id)}
         className="bg-red-500 hover:bg-red-600 text-white p-1 sm:px-6 sm:py-2 rounded-full text-lg shadow text-center"
