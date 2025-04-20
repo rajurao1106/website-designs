@@ -1,185 +1,53 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { ImSpinner10 } from "react-icons/im";
-import { MdOutlineDeleteForever } from "react-icons/md";
-import { IoMdAdd } from "react-icons/io";
-import { TbContainerOff } from "react-icons/tb";
-import { IoIosArrowBack } from "react-icons/io";
-import { IoIosArrowForward } from "react-icons/io";
+import Link from 'next/link'
+import React from 'react'
 
-// Loader Spinner
-const Loader = () => (
-  <div className="flex flex-col justify-center items-center h-screen bg-black gap-2">
-    <div className="text-6xl text-blue-500 flex justify-center items-center animate-spin">
-      <ImSpinner10 />
-    </div>
-    <p className="text-white text-xl">Loading...</p>
-  </div>
-);
-
-// Image Slider Component
-const ImageSlider = ({ id, images, updateImages, deleteContainer }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleAddImage = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const updated = [...images, reader.result];
-      updateImages(id, updated);
-      setCurrentIndex(updated.length - 1);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDeleteImage = () => {
-    if (images.length === 0) return;
-    const updated = images.filter((_, idx) => idx !== currentIndex);
-    updateImages(id, updated);
-    setCurrentIndex((prev) => Math.max(0, prev - 1));
-  };
-
-  const showPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const showNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
-
+export default function Page() {
   return (
-    <div className="relative w-full bg-gray-800 overflow-hidden shadow-lg">
-      {/* Image Display */}
-      <div className="w-full h-full flex items-center justify-center bg-black">
-        {images.length > 0 ? (
-          <img
-            src={images[currentIndex]}
-            alt="Slide"
-            className="w-full h-full transition-all duration-700"
-          />
-        ) : (
-          <span className="text-white text-lg sm:text-xl">No Image</span>
-        )}
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4 py-8 flex flex-col gap-10">
+      
+      {/* Header */}
+      <header className="text-center">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2">Welcome to WebsiteUI</h1>
+        <p className="text-sm sm:text-base text-gray-300">Smart solutions for modern hospital websites</p>
+      </header>
 
-      {/* Navigation Arrows */}
-      {images.length > 0 && (
-        <>
-          <button
-            onClick={showPrev}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-[#c9c9c975] bg-opacity-30 hover:bg-opacity-50 text-black rounded-full transition text-lg max-lg:text-sm p-2 max-lg:p-1"
-          >
-            <IoIosArrowBack />
-          </button>
-          <button
-            onClick={showNext}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-[#c9c9c975] bg-opacity-30 hover:bg-opacity-50 text-black rounded-full transition text-lg max-lg:text-sm p-2 max-lg:p-1"
-          >
-            <IoIosArrowForward />
-          </button>
-        </>
-      )}
-
-      {/* Top-Right Action Buttons */}
-      <div className="absolute bottom-1 right-2 flex sm:flex-row gap-2 sm:gap-3">
-        <label className="bg-green-600 hover:bg-green-700 flex justify-center items-center text-white px-1 sm:px-4 sm:py-2 rounded-md cursor-pointer text-lg shadow text-center">
-          <IoMdAdd />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleAddImage}
-            className="hidden"
-          />
-        </label>
-        <button
-          onClick={handleDeleteImage}
-          className="bg-red-600 hover:bg-red-700 text-white px-1 py-1 sm:px-4 sm:py-2 rounded-md text-lg shadow"
+      {/* Hero CTA Button */}
+      <div className="flex justify-center">
+        <Link
+          href="/hospital-website"
+          className="px-6 py-3 rounded-xl bg-purple-700 text-white text-lg sm:text-xl font-semibold shadow-lg hover:bg-purple-800 hover:scale-105 transition-all duration-300"
         >
-          <MdOutlineDeleteForever />
-        </button>
+          Hospital Website Design
+        </Link>
       </div>
 
-      {/* Bottom Center Delete Image Button */}
-      {images.length > 0 && (
-        <div className="absolute bottom-1 left-10 max-lg:left-6 transform -translate-x-1/2">
-          <button
-            onClick={() => deleteContainer(id)}
-            className="bg-red-500 hover:bg-red-600 text-white p-3 max-lg:p-1 rounded-full text-lg shadow text-center"
-          >
-            <TbContainerOff />
-          </button>
+      {/* Features Section */}
+      <section className="text-center">
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-6">Features</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-md mx-auto">
+          <div className="bg-slate-700 p-4 rounded-xl shadow hover:shadow-lg transition">
+            <h3 className="font-bold text-lg mb-2">Responsive Design</h3>
+            <p className="text-sm text-gray-300">Fully mobile-friendly layouts that work on all devices.</p>
+          </div>
+          <div className="bg-slate-700 p-4 rounded-xl shadow hover:shadow-lg transition">
+            <h3 className="font-bold text-lg mb-2">Modern UI/UX</h3>
+            <p className="text-sm text-gray-300">Sleek and intuitive designs with user-first principles.</p>
+          </div>
+          <div className="bg-slate-700 p-4 rounded-xl shadow hover:shadow-lg transition">
+            <h3 className="font-bold text-lg mb-2">Fast Performance</h3>
+            <p className="text-sm text-gray-300">Optimized for speed and smooth navigation.</p>
+          </div>
+          <div className="bg-slate-700 p-4 rounded-xl shadow hover:shadow-lg transition">
+            <h3 className="font-bold text-lg mb-2">Customizable</h3>
+            <p className="text-sm text-gray-300">Easily adaptable for different hospital needs.</p>
+          </div>
         </div>
-      )}
+      </section>
+
+      {/* Footer */}
+      <footer className="text-center text-gray-400 text-xs mt-10">
+        © 2025 WebsiteUI. All rights reserved.
+      </footer>
     </div>
-  );
-};
-
-// Main App
-export default function App() {
-  const [containers, setContainers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadContainers = async () => {
-      try {
-        const res = await fetch("/api/containers");
-        const data = await res.json();
-        setContainers(data);
-      } catch (error) {
-        console.error("Failed to fetch containers", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadContainers();
-  }, []);
-
-  const addNewContainer = async () => {
-    const res = await fetch("/api/containers", { method: "POST" });
-    const newContainer = await res.json();
-    setContainers((prev) => [...prev, newContainer]);
-  };
-
-  const deleteContainer = async (id) => {
-    await fetch(`/api/containers/${id}`, { method: "DELETE" });
-    setContainers((prev) => prev.filter((c) => c._id !== id));
-  };
-
-  const updateImages = async (id, updatedImages) => {
-    await fetch(`/api/containers/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ images: updatedImages }),
-    });
-    setContainers((prev) =>
-      prev.map((c) => (c._id === id ? { ...c, images: updatedImages } : c))
-    );
-  };
-
-  if (loading) return <Loader />;
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center">
-      {/* <h1 className="text-4xl font-bold mb-10 text-center">Hero Image Slider</h1> */}
-
-      {containers.map((container) => (
-        <ImageSlider
-          key={container._id}
-          id={container._id}
-          images={container.images}
-          updateImages={updateImages}
-          deleteContainer={deleteContainer}
-        />
-      ))}
-
-      <button
-        onClick={addNewContainer}
-        className="my-4 bg-purple-700 hover:bg-purple-800 text-white px-8 py-3 rounded-2xl font-semibold shadow-md transition"
-      >
-        ➕ Add New Slider
-      </button>
-    </div>
-  );
+  )
 }
