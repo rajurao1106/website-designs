@@ -68,7 +68,7 @@ export default function ImageSlider({ id, images = [], updateImages, deleteConta
       {/* Bottom Controls */}
       <div className="absolute bottom-1 right-2 flex sm:flex-row gap-2 sm:gap-3">
         {/* Add Image */}
-        <label className="bg-green-600 hover:bg-green-700 flex justify-center items-center text-white px-1 sm:px-4 sm:py-2 rounded-md cursor-pointer text-lg shadow text-center">
+        <label className="bg-[#00800070] hover:bg-green-700 flex justify-center items-center text-white px-1 sm:px-4 sm:py-2 rounded-md cursor-pointer text-lg shadow text-center">
           <IoMdAdd />
           <input type="file" accept="image/*" onChange={handleAddImage} className="hidden" />
         </label>
@@ -76,7 +76,7 @@ export default function ImageSlider({ id, images = [], updateImages, deleteConta
         {/* Delete Image */}
         <button
           onClick={handleDeleteImage}
-          className="bg-red-600 hover:bg-red-700 text-white px-1 py-1 sm:px-4 sm:py-2 rounded-md text-lg shadow"
+          className="bg-[#ff000070] hover:bg-red-500 text-white px-1 py-1 sm:px-4 sm:py-2 rounded-md text-lg shadow"
         >
           <MdOutlineDeleteForever />
         </button>
@@ -87,7 +87,7 @@ export default function ImageSlider({ id, images = [], updateImages, deleteConta
         <div className="absolute bottom-1 left-10 max-lg:left-6 transform -translate-x-1/2">
           <button
             onClick={() => deleteContainer(id)}
-            className="bg-red-500 hover:bg-red-600 text-white p-3 max-lg:p-1 rounded-full text-lg shadow text-center"
+            className="bg-[#ff000070] hover:bg-red-600 text-white p-3 max-lg:p-1 rounded-full text-lg shadow text-center"
           >
             <TbContainerOff />
           </button>
