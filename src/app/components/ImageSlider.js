@@ -83,7 +83,7 @@ export default function ImageSlider({ id, images = [], updateImages, deleteConta
       </div>
 
       {/* Delete Container */}
-      {images.length > 0 && (
+      {images.length >= 0 && (
         <div className="absolute bottom-1 left-10 max-lg:left-6 transform -translate-x-1/2">
           <button
             onClick={() => deleteContainer(id)}

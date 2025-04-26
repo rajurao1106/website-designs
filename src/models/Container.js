@@ -42,5 +42,5 @@ const ContainerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.customers ||
-  mongoose.model("customers", ContainerSchema);
+export default mongoose.models.designs ||
+  mongoose.model("designs", ContainerSchema);
