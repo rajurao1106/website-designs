@@ -4,7 +4,7 @@ import Loader from "../../components/Loader";
 import ImageSlider from "../../components/ImageSlider";
 
 // Main App
-export default function Homepage() {
+export default function page() {
   const [containers, setContainers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,17 +40,14 @@ export default function Homepage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         advertising_agency: {
-          homepage: updatedImages,   // update homepage array inside advertising_agency
-          about: [],
-          service: [],
-          contact: [],
+          about: updatedImages,
         },
       }),
     });
     setContainers((prev) =>
       prev.map((c) =>
         c._id === id
-          ? { ...c, advertising_agency: { about: updatedImages, about: [], service: [], contact: [] } }
+          ? { ...c, advertising_agency: { homepage: [], about: [updatedImages], service: [], contact: [] } }
           : c
       )
     );
@@ -65,7 +62,7 @@ export default function Homepage() {
         <ImageSlider
           key={container._id}
           id={container._id}
-          images={container.advertising_agency.about} // Pass homepage array
+          images={container.advertising_agency.about} // Pass about array
           updateImages={updateImages} // Pass function directly
           deleteContainer={deleteContainer}
         />
