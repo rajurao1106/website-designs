@@ -1,10 +1,46 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const ContainerSchema = new mongoose.Schema({
-  images: {
-    type: [String],
-    default: [],
+const ContainerSchema = new mongoose.Schema(
+  {
+    advertising_agency: {
+      homepage: {
+        type: [String],
+        default: [],
+      },
+      about: {
+        type: [String],
+        default: [],
+      },
+      service: {
+        type: [String],
+        default: [],
+      },
+      contact: {
+        type: [String],
+        default: [],
+      },
+    },
+    hospital_website: {
+      homepage: {
+        type: [String],
+        default: [],
+      },
+      about: {
+        type: [String],
+        default: [],
+      },
+      service: {
+        type: [String],
+        default: [],
+      },
+      contact: {
+        type: [String],
+        default: [],
+      },
+    },
   },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-export default mongoose.models.Container || mongoose.model('Container', ContainerSchema);
+export default mongoose.models.customers ||
+  mongoose.model("customers", ContainerSchema);

@@ -11,7 +11,7 @@ export default function Homepage() {
   useEffect(() => {
     const loadContainers = async () => {
       try {
-        const res = await fetch("/api/hospital-website");
+        const res = await fetch("/api/containers");
         const data = await res.json();
         setContainers(data);
       } catch (error) {
@@ -24,24 +24,35 @@ export default function Homepage() {
   }, []);
 
   const addNewContainer = async () => {
-    const res = await fetch("/api/hospital-website", { method: "POST" });
+    const res = await fetch("/api/containers", { method: "POST" });
     const newContainer = await res.json();
     setContainers((prev) => [...prev, newContainer]);
   };
 
   const deleteContainer = async (id) => {
-    await fetch(`/api/hospital-website/${id}`, { method: "DELETE" });
+    await fetch(`/api/containers/${id}`, { method: "DELETE" });
     setContainers((prev) => prev.filter((c) => c._id !== id));
   };
 
   const updateImages = async (id, updatedImages) => {
-    await fetch(`/api/hospital-website/${id}`, {
+    await fetch(`/api/containers/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ images: updatedImages }),
+      body: JSON.stringify({
+        advertising_agency: {
+          homepage: updatedImages,   // update homepage array inside advertising_agency
+          about: [],
+          service: [],
+          contact: [],
+        },
+      }),
     });
     setContainers((prev) =>
-      prev.map((c) => (c._id === id ? { ...c, images: updatedImages } : c))
+      prev.map((c) =>
+        c._id === id
+          ? { ...c, advertising_agency: { homepage: updatedImages, about: [], service: [], contact: [] } }
+          : c
+      )
     );
   };
 
@@ -49,18 +60,18 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center">
-      {/* <h1 className="text-4xl font-bold mb-10 text-center">Hero Image Slider</h1> */}
-
+      {/* All Sliders */}
       {containers.map((container) => (
         <ImageSlider
           key={container._id}
           id={container._id}
-          images={container.images}
-          updateImages={updateImages}
+          images={container.advertising_agency.homepage} // Pass homepage array
+          updateImages={updateImages} // Pass function directly
           deleteContainer={deleteContainer}
         />
       ))}
 
+      {/* Add New Button */}
       <button
         onClick={addNewContainer}
         className="my-4 bg-purple-700 hover:bg-purple-800 text-white px-8 py-3 rounded-2xl font-semibold shadow-md transition"

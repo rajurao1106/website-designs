@@ -11,14 +11,26 @@ export default function Page() {
         <p className="text-sm sm:text-base text-gray-300">Smart solutions for modern hospital websites</p>
       </header>
 
-      {/* Hero CTA Button */}
+      <div className='flex flex-col gap-3'>
+        {/* Hero CTA Button */}
       <div className="flex justify-center">
         <Link
           href="/hospital-website"
-          className="px-6 py-3 rounded-xl bg-purple-700 text-white text-lg sm:text-xl font-semibold shadow-lg hover:bg-purple-800 hover:scale-105 transition-all duration-300"
+          className="px-6 w-1/4 text-center max-lg:w-full py-3 rounded-xl bg-purple-700 text-white text-lg sm:text-xl font-semibold shadow-lg hover:bg-purple-800 hover:scale-105 transition-all duration-300"
         >
           Hospital Website Design
         </Link>
+      </div> 
+      
+      {/* Hero CTA Button */}
+      <div className="flex justify-center">
+        <Link
+          href="/advertising-agency"
+          className="px-6 w-1/4 text-center max-lg:w-full py-3 rounded-xl bg-purple-700 text-white text-lg sm:text-xl font-semibold shadow-lg hover:bg-purple-800 hover:scale-105 transition-all duration-300"
+        >
+          Advertising Agency
+        </Link>
+      </div>
       </div>
 
       {/* Features Section */}
